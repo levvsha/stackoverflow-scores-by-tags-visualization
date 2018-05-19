@@ -18,37 +18,49 @@ const colors = [
 ];
 
 let vizualization = null;
+let currentActiveUserId = null;
 
-const fetchAndDraw = (input) => {
-  const userId = parseInt(input, 10) || (input || '').split('/')[4];
+const fetchAndDraw = (userId) => {
+  if (userId === currentActiveUserId) return false;
+
+  currentActiveUserId = userId;
 
   fetch(getApiEndPoint(userId))
-    .then(function(response) { return response.json(); })
-    .then(function(json) {
+    .then(response => response.json())
+    .then(json => {
       if (vizualization) {
         vizualization.update(json.items, false);
       } else {
-        // vizualization = new Vizualization(json.items);
+        vizualization = new Vizualization(json.items);
       }
     });
 }
 
 const getApiEndPoint = userId => {
-  return `https://api.stackexchange.com/2.2/users/${ userId || 5806646 }/top-answer-tags?key=U4DMV*8nvpm3EOpvf69Rxw((&site=stackoverflow&pagesize=100&filter=default`
+  return `https://api.stackexchange.com/2.2/users/${ userId }/top-answer-tags?key=U4DMV*8nvpm3EOpvf69Rxw((&site=stackoverflow&pagesize=100&filter=default`
 };
 
 const input = document.getElementById('js-input');
-const MAX_RADIUS = 90;
 
-document.getElementById('js-send-button').addEventListener('click', () => {
-  fetchAndDraw(input.value, true);
+input.addEventListener('keyup', event => {
+  const result = (event.target.value || '').match(/users\/([0-9]*)/i);
+
+  if (!result) return false;
+
+  const userId = parseInt(result[1], 10);
+
+  if (userId) {
+    fetchAndDraw(userId);
+  }
 });
+
+const MAX_RADIUS = 70;
 
 d3.selectAll('.js-username').on('click', function() {
   fetchAndDraw(this.getAttribute('data-user-id'));
 });
 
-fetchAndDraw();
+fetchAndDraw(22656);
 
 const svg = d3.select('body svg');
 
@@ -79,7 +91,6 @@ class Vizualization {
     this.gradientLegend = null;
 
     this.circlesUpdateTransition = d3.transition().duration(750);
-    this.circlesPulsingTransition = null;
 
     this.drawSceleton(rawData);
     this.bindEvents();
@@ -94,10 +105,10 @@ class Vizualization {
     this.scales.colorScheme = d3.scaleOrdinal(colors);
 
     this.simulation = d3.forceSimulation()
-      .force('forceX', d3.forceX().strength(.1).x(this.sizes.width * .5))
-      .force('forceY', d3.forceY().strength(.1).y(this.sizes.height * .5))
-      .force('center', d3.forceCenter().x(this.sizes.width * .5).y(this.sizes.height * .5))
-      .force('charge', d3.forceManyBody().strength(-15));
+      .force('forceX', d3.forceX().strength(.1).x(this.sizes.width * 0.75))
+      .force('forceY', d3.forceY().strength(.1).y(this.sizes.height * .55))
+      .force('center', d3.forceCenter().x(this.sizes.width * 0.75).y(this.sizes.height * .55))
+      .force('charge', d3.forceManyBody().strength(-25));
 
     this.nodes.svg
       .attr('width', this.sizes.width)
@@ -248,8 +259,6 @@ class Vizualization {
   }
 
   bindEvents() {
-    const component = this;
-
     this.simulation
       .on('tick', () => {
         this.nodes.circleGroup.attr('transform', d => `translate(${ d.x },${ d.y })`);
@@ -310,7 +319,7 @@ class GradientLegend {
     this.options = options;
 
     this.sizes = {
-      width: 600
+      width: 450
     };
 
     const legendScale = d3.scaleLinear()
@@ -339,7 +348,7 @@ class GradientLegend {
     countRange[2] = countRange[1] - countRange[0];
     const countPoint = [];
 
-    for(var i = 0; i < numStops; i++) {
+    for(let i = 0; i < numStops; i++) {
       countPoint.push(i * countRange[2] / (numStops - 1) + countRange[0]);
     }
 
@@ -356,26 +365,19 @@ class GradientLegend {
 
     this.nodes.root = this.nodes.svg.append('g')
       .attr('class', 'legendWrapper')
-      .attr('transform', `translate(${ this.options.containerWidth / 2 },80)`);
+      .attr('transform', `translate(${ this.options.containerWidth - 50 },30)`);
 
     this.nodes.root.append('rect')
       .attr('class', 'legendRect')
-      .attr('x', -this.sizes.width / 2)
+      .attr('x', -this.sizes.width)
       .attr('y', 0)
       .attr('width', this.sizes.width)
       .attr('height', 10)
       .style('fill', 'url(#legend-traffic)');
 
-    this.nodes.root.append('text')
-      .attr('class', 'legendTitle')
-      .attr('x', 0)
-      .attr('y', -10)
-      .style('text-anchor', 'middle')
-      .text('Scores');
-
     this.nodes.axis = this.nodes.root.append('g')
       .attr('class', 'axis')
-      .attr('transform', 'translate(0,10)');
+      .attr('transform', `translate(${ -this.sizes.width / 2 },10)`);
 
     this.update(this.options.upperValueForScale);
   }
