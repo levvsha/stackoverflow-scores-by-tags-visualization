@@ -20,8 +20,12 @@ const colors = [
 let vizualization = null;
 let currentActiveUserId = null;
 
-const fetchAndDraw = (userId) => {
+const fetchAndDraw = (userId, isFromInput) => {
   if (userId === currentActiveUserId) return false;
+
+  if (isFromInput) {
+    usersNamesLinks.classed('active', false);
+  }
 
   currentActiveUserId = userId;
 
@@ -50,17 +54,24 @@ input.addEventListener('keyup', event => {
   const userId = parseInt(result[1], 10);
 
   if (userId) {
-    fetchAndDraw(userId);
+    fetchAndDraw(userId, true);
   }
 });
 
 const MAX_RADIUS = 70;
 
-d3.selectAll('.js-username').on('click', function() {
-  fetchAndDraw(this.getAttribute('data-user-id'));
+const usersNamesLinks = d3.selectAll('.js-username');
+
+usersNamesLinks.on('click', () => {
+  input.value = '';
+
+  usersNamesLinks.classed('active', false);
+  d3.select(d3.event.target).classed('active', true);
+
+  fetchAndDraw(d3.event.target.getAttribute('data-user-id'));
 });
 
-fetchAndDraw(22656);
+fetchAndDraw(usersNamesLinks.nodes()[0].getAttribute('data-user-id'));
 
 const svg = d3.select('body svg');
 
@@ -78,7 +89,8 @@ class Vizualization {
       circleGroup: null,
       circles: null,
       tooltip: d3.select('.js-tooltip'),
-      tagLinks: d3.selectAll('.js-tag-link')
+      tagLinks: d3.selectAll('.js-tag-link'),
+      message: d3.select('.js-message')
     };
 
     this.scales = {
@@ -122,6 +134,12 @@ class Vizualization {
   }
 
   update(newData, isInitial) {
+    if (newData.length === 100) {
+      this.nodes.message.style('display', 'block');
+    } else {
+      this.nodes.message.style('display', 'none');
+    }
+
     const areaScaleDomain = d3.extent(newData, d => d.answer_score);
 
     this.scales.circleAreaScale = d3.scaleLinear()
