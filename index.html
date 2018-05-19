@@ -10,30 +10,34 @@
 </head>
 <body>
 <div class="main">
-  <div class="about">
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi autem commodi, culpa deserunt dolore error fugiat, iste itaque laborum minima molestiae odio odit quas quisquam similique vitae, voluptas. Ipsum, quos.
-    </p>
+  <div>
+    <input id="js-input" type="search" placeholder="Search Wikipedia..." class="search-input">
+    <button id="js-send-button" class="search-button">Run</button>
   </div>
   <div>
-    <input id="js-input" type="text">
-    <button id="js-send-button">send</button>
+    <div class="left-column">
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi autem commodi, culpa deserunt dolore error fugiat, iste itaque laborum minima molestiae odio odit quas quisquam similique vitae, voluptas. Ipsum, quos.
+      </p>
+      <ul class="users-list">
+        <li class="username js-username" data-user-id="29407">
+          Jon Skeet
+        </li>
+        <li class="username js-username" data-user-id="17034">
+          Hans Passant
+        </li>
+        <li class="username js-username" data-user-id="49485">
+          Sophie Alpert
+        </li>
+        <li class="username js-username" data-user-id="458193">
+          Dan Abramov
+        </li>
+      </ul>
+    </div>
+    <div class="right-column">
+      <svg></svg>
+    </div>
   </div>
-  <ul class="users-list">
-    <li class="username js-username" data-user-id="29407">
-      Jon Skeet
-    </li>
-    <li class="username js-username" data-user-id="17034">
-      Hans Passant
-    </li>
-    <li class="username js-username" data-user-id="49485">
-      Sophie Alpert
-    </li>
-    <li class="username js-username" data-user-id="458193">
-      Dan Abramov
-    </li>
-  </ul>
-  <svg></svg>
 </div>
 <div class="tooltip js-tooltip" style="display: none"></div>
 

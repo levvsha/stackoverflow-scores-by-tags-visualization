@@ -26,9 +26,9 @@ const fetchAndDraw = (input) => {
     .then(function(response) { return response.json(); })
     .then(function(json) {
       if (vizualization) {
-        vizualization.update(json.items, false, true);
+        vizualization.update(json.items, false);
       } else {
-        vizualization = new Vizualization(json.items);
+        // vizualization = new Vizualization(json.items);
       }
     });
 }
@@ -48,15 +48,15 @@ d3.selectAll('.js-username').on('click', function() {
   fetchAndDraw(this.getAttribute('data-user-id'));
 });
 
-export default () => fetchAndDraw();
+fetchAndDraw();
 
 const svg = d3.select('body svg');
 
 class Vizualization {
   constructor(rawData) {
     this.sizes = {
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width: 1100,
+      height: 540,
       maxRadius: MAX_RADIUS,
       maxArea: Math.pow(MAX_RADIUS , 2) * Math.PI
     };
@@ -110,7 +110,7 @@ class Vizualization {
     this.update(rawData, true);
   }
 
-  update(newData, isInitial, useColorByScore) {
+  update(newData, isInitial) {
     const areaScaleDomain = d3.extent(newData, d => d.answer_score);
 
     this.scales.circleAreaScale = d3.scaleLinear()
@@ -169,7 +169,7 @@ class Vizualization {
     this.nodes.circles
       .transition(this.circlesUpdateTransition)
       .attr('r', d => d.radius)
-      .attr('fill', d => (useColorByScore ? this.getColorByScore(d) : this.getColorByTag(d)));
+      .attr('fill', d => this.getColorByScore(d));
 
     this.nodes.circles = this.nodes.circles
       .enter()
@@ -179,7 +179,7 @@ class Vizualization {
     this.nodes.circles
       .transition(this.circlesUpdateTransition)
       .attr('r', d => d.radius)
-      .attr('fill', d => (useColorByScore ? this.getColorByScore(d) : this.getColorByTag(d)));
+      .attr('fill', d => this.getColorByScore(d));
 
     this.nodes.labels = this.nodes.circleGroup
       .selectAll('text')
@@ -254,35 +254,6 @@ class Vizualization {
       .on('tick', () => {
         this.nodes.circleGroup.attr('transform', d => `translate(${ d.x },${ d.y })`);
       });
-
-    this.nodes.tagLinks
-      .on('mouseenter', function() {
-        const tag = this.getAttribute('data-tag');
-
-        component.animateCircles(tag, true);
-      })
-      .on('mouseleave', function() {
-        const tag = this.getAttribute('data-tag');
-
-        component.animateCircles(tag, false, true);
-      });
-  }
-
-  animateCircles(tag, isIncreaseIteration, isStop) {
-    this.circlesPulsingTransition = d3.transition()
-      .duration(400)
-      .on('end', () => {
-        if (isStop && !isIncreaseIteration) {
-          return;
-        }
-
-        this.animateCircles(tag, !isIncreaseIteration);
-      });
-
-    this.nodes.circles
-      .filter(d => groups[d.tag] === tag)
-      .transition(this.circlesPulsingTransition)
-      .attr('r', d => d.radius - (isIncreaseIteration ? 3 : 0));
   }
 
   getProcessedData(rawData) {
@@ -297,14 +268,6 @@ class Vizualization {
 
   getColorByScore(d) {
     return this.scales.colorScale(d.score);
-  }
-
-  getColorByTag(d) {
-    if (!groups[d.tag]) {
-      console.log('d.tag ==>', d.tag);
-    }
-
-    return this.scales.colorScheme(groups[d.tag] || 'other')
   }
 
   moveTooltip(left, top) {
