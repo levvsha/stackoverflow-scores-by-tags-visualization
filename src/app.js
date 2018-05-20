@@ -90,7 +90,8 @@ class Vizualization {
       circles: null,
       tooltip: d3.select('.js-tooltip'),
       tagLinks: d3.selectAll('.js-tag-link'),
-      message: d3.select('.js-message')
+      message: d3.select('.js-message-tags'),
+      noScoresMessage: d3.select('.js-message-no-scores')
     };
 
     this.scales = {
@@ -120,7 +121,7 @@ class Vizualization {
       .force('forceX', d3.forceX().strength(.1).x(this.sizes.width * 0.75))
       .force('forceY', d3.forceY().strength(.1).y(this.sizes.height * .55))
       .force('center', d3.forceCenter().x(this.sizes.width * 0.75).y(this.sizes.height * .55))
-      .force('charge', d3.forceManyBody().strength(-25));
+      .force('charge', d3.forceManyBody().strength(-20));
 
     this.nodes.svg
       .attr('width', this.sizes.width)
@@ -140,26 +141,33 @@ class Vizualization {
       this.nodes.message.style('display', 'none');
     }
 
-    const areaScaleDomain = d3.extent(newData, d => d.answer_score);
+    if (newData.length) {
+      const areaScaleDomain = d3.extent(newData, d => d.answer_score);
 
-    this.scales.circleAreaScale = d3.scaleLinear()
-      .domain(areaScaleDomain)
-      .range([this.sizes.maxArea / (areaScaleDomain[1] / areaScaleDomain[0]), this.sizes.maxArea]);
+      this.scales.circleAreaScale = d3.scaleLinear()
+        .domain(areaScaleDomain)
+        .range([this.sizes.maxArea / (areaScaleDomain[1] / areaScaleDomain[0]), this.sizes.maxArea]);
 
-    const upperValueForScale = _ceil(areaScaleDomain[1], -(areaScaleDomain[1].toString().length - 2));
+      const upperValueForScale = _ceil(areaScaleDomain[1], -(areaScaleDomain[1].toString().length - 2));
 
-    this.scales.colorScale = d3.scaleLinear()
-      .domain([0, upperValueForScale / 2, upperValueForScale])
-      .range(['rgb(34, 131, 187)', 'rgb(253, 255, 140)', 'rgb(216, 31, 28)']);
+      this.scales.colorScale = d3.scaleLinear()
+        .domain([0, upperValueForScale / 2, upperValueForScale])
+        .range(['rgb(34, 131, 187)', 'rgb(253, 255, 140)', 'rgb(216, 31, 28)']);
 
-    if (isInitial) {
-      this.gradientLegend = new GradientLegend(this.nodes.svg, {
-        upperValueForScale,
-        containerWidth: this.sizes.width,
-        colorScale: this.scales.colorScale
-      });
+      if (isInitial) {
+        this.gradientLegend = new GradientLegend(this.nodes.svg, {
+          upperValueForScale,
+          containerWidth: this.sizes.width,
+          colorScale: this.scales.colorScale
+        });
+      } else {
+        this.nodes.noScoresMessage.style('display', 'none');
+
+        this.gradientLegend.update(upperValueForScale);
+      }
     } else {
-      this.gradientLegend.update(upperValueForScale);
+      this.nodes.noScoresMessage.style('display', 'block');
+      this.gradientLegend.hide();
     }
 
     this.data = this.getProcessedData(newData);
@@ -400,7 +408,13 @@ class GradientLegend {
     this.update(this.options.upperValueForScale);
   }
 
+  hide() {
+    this.nodes.root.style('display', 'none');
+  }
+
   update(maxDomainValue) {
+    this.nodes.root.style('display', 'block');
+
     const xScale = d3.scaleLinear()
       .range([-this.sizes.width / 2, this.sizes.width / 2])
       .domain([0, maxDomainValue])
@@ -408,6 +422,7 @@ class GradientLegend {
 
     const xAxis = d3.axisBottom()
       .scale(xScale)
+      .ticks(maxDomainValue > 6 ? 6 : maxDomainValue)
       .tickFormat(d3.format('.0f'));
 
     this.nodes.axis
