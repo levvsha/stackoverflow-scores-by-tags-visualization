@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/css?family=Nanum+Pen+Script" rel="stylesheet">
+    <title>Stack Overflow user's scores by tags visualization</title>
+<link href="main.e8594739e32e403db431.css" rel="stylesheet"></head>
+<body>
+<div class="main">
+    <div class="section">
+        <div class="description">
+            <p>
+                This is a Stack Overflow user's scores by tags visualization.
+                <br>
+                Check how it looks like for some most effective users:
+            </p>
+            <ul class="users-list">
+                <li class="username active js-username" data-user-id="22656">
+                    Jon Skeet - most effective user for all time.
+                </li>
+                <li class="username js-username" data-user-id="1172002">
+                    Lars Kotthoff - <a href="https://stackoverflow.com/tags/d3.js/topusers" target="_blank" class="so-tag">d3.js</a> tag most effective user.
+                </li>
+                <li class="username js-username" data-user-id="365814">
+                    Mike Bostock - creator of D3.js.
+                </li>
+                <li class="username js-username" data-user-id="458193">
+                    Dan Abramov - <a href="https://stackoverflow.com/tags/reactjs/topusers" target="_blank" class="so-tag">reactjs</a> and <a href="https://stackoverflow.com/tags/redux/topusers" target="_blank" class="so-tag">redux</a> tags most effective user.
+                </li>
+                <li class="username js-username" data-user-id="157247">
+                    T.J. Crowder - <a href="https://stackoverflow.com/tags/javascript/topusers" target="_blank" class="so-tag">javascript</a> tag most effective user.
+                </li>
+                <li class="username js-username" data-user-id="100297">
+                    Martijn Pieters - <a href="https://stackoverflow.com/tags/python/topusers" target="_blank" class="so-tag">python</a> tag most effective user.
+                </li>
+                <li class="username js-username" data-user-id="1144035">
+                    Gordon Linoff - <a href="https://stackoverflow.com/tags/sql/topusers" target="_blank" class="so-tag">sql</a> tag most effective user.
+                </li>
+                <li class="username js-username" data-user-id="123527">
+                    Simone Carletti - <a href="https://stackoverflow.com/tags/ruby-on-rails/topusers" target="_blank" class="so-tag">ruby-on-rails</a> tag most effective user.
+                </li>
+            </ul>
+            <p>
+                Or paste you <a target="_blank" href="http://ya.ru"><b>Stack Overflow profile url</b></a> to the input below:
+            </p>
+            <div>
+                <input id="js-input" type="text" placeholder="Paste your Stack Overflow profile url to here" class="search-input">
+            </div>
+        </div>
+        <div class="message-no-scores js-message-no-scores">
+            This user does not have any tags with scores
+        </div>
+        <div class="message-tags js-message-tags">
+            100 most scoring tags are shown
+        </div>
+        <div class="chart">
+            <svg></svg>
+        </div>
+    </div>
+</div>
+<div class="tooltip js-tooltip" style="display: none"></div>
+<script type="text/javascript" src="main.e8594739e32e403db431.js"></script></body>
+</html>
