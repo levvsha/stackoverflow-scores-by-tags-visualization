@@ -46,6 +46,10 @@ const getApiEndPoint = userId => {
 
 const input = document.getElementById('js-input');
 
+input.addEventListener('click', event => {
+  event.target.setSelectionRange(0, event.target.value.length);
+});
+
 input.addEventListener('keyup', event => {
   const result = (event.target.value || '').match(/users\/([0-9]*)/i);
 
@@ -423,7 +427,7 @@ class GradientLegend {
     const xAxis = d3.axisBottom()
       .scale(xScale)
       .ticks(maxDomainValue > 6 ? 6 : maxDomainValue)
-      .tickFormat(d3.format('.0f'));
+      .tickFormat(d3.format(','));
 
     this.nodes.axis
       .transition(this.axisTransition)
